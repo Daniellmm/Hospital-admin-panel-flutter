@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:get/get.dart';
 import 'package:hmsapp/constants/controllers.dart';
 import 'package:hmsapp/helpers/responsiveness.dart';
@@ -46,46 +47,37 @@ class _PatientPageState extends State<PatientPage> {
   }
 
 
-int serialNumber = 1;
-  void generateCode() {
-    if (validateFields()) {
-      String newCode = ''; // Initialize new code variable
-      bool codeExists = true; // Flag to check if the code exists
 
-      // Loop until a unique code is generated
-      while (codeExists) {
-        newCode = serialNumber.toString().padLeft(4, '0'); // Generate new code
 
-        // Check if the code exists in Firestore
-        FirebaseFirestore.instance
-            .collection('patients')
-            .where('code', isEqualTo: newCode)
-            .get()
-            .then((QuerySnapshot querySnapshot) {
-          if (querySnapshot.docs.isEmpty) {
-            // If the code doesn't exist, set the flag to false
-            codeExists = false;
-          }
-        });
+void generateCode() {
+  if (validateFields()) {
+    String newCode = ''; // Initialize new code variable
 
-        // If the code exists, increment the serial number and try again
-        if (codeExists) {
-          serialNumber++;
+    // Loop until a unique code is generated
+    while (true) {
+      // Generate a random four-digit code between 1000 and 9999
+      newCode = (1000 + Random().nextInt(9000)).toString();
+
+      // Check if the code exists in Firestore
+      FirebaseFirestore.instance
+          .collection('patients')
+          .where('code', isEqualTo: newCode)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        if (querySnapshot.docs.isEmpty) {
+          // If the code doesn't exist, update the UI and exit the loop
+          setState(() {
+            generatedCode = newCode;
+            codeController.text = generatedCode;
+          });
+          return;
         }
-      }
-
-      // Set the generated code and update the UI
-      setState(() {
-        generatedCode = newCode;
-        codeController.text = generatedCode;
       });
-
-      // Increment serial number for the next code
-      serialNumber++;
-    } else {
-      return null;
     }
+  } else {
+    return null;
   }
+}
 
 
   // Save data to Firestore
@@ -525,7 +517,7 @@ int serialNumber = 1;
                     height: 10,
                   ),
                   const Text(
-                    'Generated Code',
+                    'Card Number/Auth Code',
                     style: TextStyle(fontSize: 25),
                   ),
                   const SizedBox(

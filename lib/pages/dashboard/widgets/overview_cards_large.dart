@@ -56,6 +56,7 @@ class _OverviewCardsLargeScreenState extends State<OverviewCardsLargeScreen> {
     // Retrieve data from Firestore
     QuerySnapshot<Map<String, dynamic>> snapshot =
         await FirebaseFirestore.instance.collection('bookings').get();
+        
 
     // Update the count of appointments
     setState(() {

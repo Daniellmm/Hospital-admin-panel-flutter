@@ -53,6 +53,7 @@ class _ConsultPageState extends State<ConsultPage> {
         'exerciseAngina': exerciseController.text,
         'STSlope': stController.text,
         'oldpeak': oldpeakController.text,
+        'Dateofconsultation': Timestamp.now(),
       });
     } catch (e) {
       SnackBar(

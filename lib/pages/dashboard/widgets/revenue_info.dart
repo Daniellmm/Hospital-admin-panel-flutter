@@ -14,20 +14,6 @@ class RevenueInfo extends StatefulWidget {
 }
 
 class _RevenueInfoState extends State<RevenueInfo> {
-  String getFormattedAmount() {
-    if (widget.amount == null) {
-      return '';
-    }
-    // Parse amount to double
-    double amount = double.tryParse(widget.amount!) ?? 0.0;
-    // Format amount with Naira symbol
-    NumberFormat format = NumberFormat.currency(
-      locale: Platform.localeName,
-      symbol: '₦', // Naira symbol
-    );
-    return format.format(amount);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -40,7 +26,7 @@ class _RevenueInfoState extends State<RevenueInfo> {
               style: TextStyle(color: lightGrey, fontSize: 16),
             ),
             TextSpan(
-              text: getFormattedAmount(),
+              text: "${widget.amount != null ? '₦${widget.amount}' : ''}",
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ],

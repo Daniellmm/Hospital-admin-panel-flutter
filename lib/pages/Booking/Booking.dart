@@ -74,6 +74,7 @@ Future<void> BookTime() async {
           'date': dateController.text,
           'symptoms': symptomController.text,
           'note': noteController.text,
+          'Dateofappointment': Timestamp.now(),
          
         });
 
