@@ -1,0 +1,334 @@
+{
+    "@context": {
+        "@language": "en",
+        "@vocab": "https://schema.org/",
+        "citeAs": "cr:citeAs",
+        "column": "cr:column",
+        "conformsTo": "dct:conformsTo",
+        "cr": "http://mlcommons.org/croissant/",
+        "data": {
+            "@id": "cr:data",
+            "@type": "@json"
+        },
+        "dataBiases": "cr:dataBiases",
+        "dataCollection": "cr:dataCollection",
+        "dataType": {
+            "@id": "cr:dataType",
+            "@type": "@vocab"
+        },
+        "dct": "http://purl.org/dc/terms/",
+        "extract": "cr:extract",
+        "field": "cr:field",
+        "fileProperty": "cr:fileProperty",
+        "fileObject": "cr:fileObject",
+        "fileSet": "cr:fileSet",
+        "format": "cr:format",
+        "includes": "cr:includes",
+        "isEnumeration": "cr:isEnumeration",
+        "isLiveDataset": "cr:isLiveDataset",
+        "jsonPath": "cr:jsonPath",
+        "key": "cr:key",
+        "md5": "cr:md5",
+        "parentField": "cr:parentField",
+        "path": "cr:path",
+        "personalSensitiveInformation": "cr:personalSensitiveInformation",
+        "recordSet": "cr:recordSet",
+        "references": "cr:references",
+        "regex": "cr:regex",
+        "repeated": "cr:repeated",
+        "replace": "cr:replace",
+        "sc": "https://schema.org/",
+        "separator": "cr:separator",
+        "source": "cr:source",
+        "subField": "cr:subField",
+        "transform": "cr:transform",
+        "wd": "https://www.wikidata.org/wiki/"
+    },
+    "alternateName": "Comprehensive dataset combined from 5 popular heart disease datasets",
+    "conformsTo": "http://mlcommons.org/croissant/1.0",
+    "license": {
+        "@type": "sc:CreativeWork",
+        "name": "Attribution 4.0 International (CC BY 4.0)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "distribution": [
+        {
+            "contentUrl": "https://www.kaggle.com/api/v1/datasets/download/mexwell/heart-disease-dataset?datasetVersionNumber=2",
+            "contentSize": "398.893 KB",
+            "md5": "\u002Brh6f3hcXbJbbLwCgdHtsQ==",
+            "encodingFormat": "application/zip",
+            "@id": "archive.zip",
+            "@type": "cr:FileObject",
+            "name": "archive.zip",
+            "description": "Archive containing all the contents of the \uD83E\uDEC0 Heart Disease Dataset dataset"
+        },
+        {
+            "includes": "*.pdf",
+            "containedIn": {
+                "@id": "archive.zip"
+            },
+            "encodingFormat": "application/pdf",
+            "@id": "application-pdf_fileset",
+            "@type": "cr:FileSet",
+            "name": "application/pdf files",
+            "description": "application/pdf files contained in archive.zip"
+        },
+        {
+            "contentUrl": "heart_statlog_cleveland_hungary_final.csv",
+            "containedIn": {
+                "@id": "archive.zip"
+            },
+            "encodingFormat": "text/csv",
+            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject",
+            "@type": "cr:FileObject",
+            "name": "heart_statlog_cleveland_hungary_final.csv",
+            "description": "heart disease data"
+        }
+    ],
+    "recordSet": [
+        {
+            "field": [
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "age"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/age",
+                    "@type": "cr:Field",
+                    "name": "age",
+                    "description": "age"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "sex"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/sex",
+                    "@type": "cr:Field",
+                    "name": "sex",
+                    "description": "sex"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "chest pain type"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/chest\u002Bpain\u002Btype",
+                    "@type": "cr:Field",
+                    "name": "chest pain type",
+                    "description": "chest pain type"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "resting bp s"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/resting\u002Bbp\u002Bs",
+                    "@type": "cr:Field",
+                    "name": "resting bp s",
+                    "description": "resting bp s"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "cholesterol"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/cholesterol",
+                    "@type": "cr:Field",
+                    "name": "cholesterol",
+                    "description": "cholesterol"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "fasting blood sugar"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/fasting\u002Bblood\u002Bsugar",
+                    "@type": "cr:Field",
+                    "name": "fasting blood sugar",
+                    "description": "fasting blood sugar"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "resting ecg"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/resting\u002Becg",
+                    "@type": "cr:Field",
+                    "name": "resting ecg",
+                    "description": "resting ecg"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "max heart rate"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/max\u002Bheart\u002Brate",
+                    "@type": "cr:Field",
+                    "name": "max heart rate",
+                    "description": "max heart rate"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "exercise angina"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/exercise\u002Bangina",
+                    "@type": "cr:Field",
+                    "name": "exercise angina",
+                    "description": "exercise angina"
+                },
+                {
+                    "dataType": [
+                        "sc:Float"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "oldpeak"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/oldpeak",
+                    "@type": "cr:Field",
+                    "name": "oldpeak",
+                    "description": "oldpeak"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "ST slope"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/ST\u002Bslope",
+                    "@type": "cr:Field",
+                    "name": "ST slope",
+                    "description": "st slope"
+                },
+                {
+                    "dataType": [
+                        "sc:Integer"
+                    ],
+                    "source": {
+                        "fileObject": {
+                            "@id": "heart_statlog_cleveland_hungary_final.csv_fileobject"
+                        },
+                        "extract": {
+                            "column": "target"
+                        }
+                    },
+                    "@id": "heart_statlog_cleveland_hungary_final.csv/target",
+                    "@type": "cr:Field",
+                    "name": "target",
+                    "description": "target"
+                }
+            ],
+            "@id": "heart_statlog_cleveland_hungary_final.csv",
+            "@type": "cr:RecordSet",
+            "name": "heart_statlog_cleveland_hungary_final.csv",
+            "description": "heart disease data"
+        }
+    ],
+    "version": 2,
+    "keywords": [
+        "task \u003E binary-classification",
+        "task \u003E classification",
+        "subject \u003E health and fitness \u003E health \u003E medicine",
+        "subject \u003E health and fitness \u003E health \u003E healthcare \u003E drugs and medications",
+        "subject \u003E health and fitness \u003E health \u003E health conditions \u003E heart conditions"
+    ],
+    "isAccessibleForFree": true,
+    "includedInDataCatalog": {
+        "@type": "sc:DataCatalog",
+        "name": "Kaggle",
+        "url": "https://www.kaggle.com"
+    },
+    "creator": {
+        "@type": "sc:Person",
+        "name": "mexwell",
+        "url": "/mexwell",
+        "image": "https://storage.googleapis.com/kaggle-avatars/thumbnails/3952497-kg.jpeg?t=2023-09-10-11-32-10"
+    },
+    "publisher": {
+        "@type": "sc:Organization",
+        "name": "Kaggle",
+        "url": "https://www.kaggle.com/organizations/kaggle",
+        "image": "https://storage.googleapis.com/kaggle-organizations/4/thumbnail.png"
+    },
+    "thumbnailUrl": "https://storage.googleapis.com/kaggle-datasets-images/4755824/8062170/a089b7a9e38de5d2369ea274dcb2533d/dataset-card.jpg?t=2024-04-08-09-44-58",
+    "dateModified": "2024-04-08T09:43:49.93",
+    "@type": "sc:Dataset",
+    "name": "\uD83E\uDEC0 Heart Disease Dataset",
+    "url": "https://www.kaggle.com/datasets/mexwell/heart-disease-dataset/versions/2",
+    "description": "This heart disease dataset is curated by combining 5 popular heart disease datasets already available independently but not combined before. In this dataset, 5 heart datasets are combined over 11 common features which makes it the largest heart disease dataset available so far for research purposes. The five datasets used for its curation are:\n\n- Cleveland\n- Hungarian\n- Switzerland\n- Long Beach VA\n- Statlog (Heart) Data Set.\n\nThis dataset consists of 1190 instances with 11 features. These datasets were collected and combined at one place to help advance research on CAD-related machine learning and data mining algorithms, and hopefully to ultimately advance clinical diagnosis and early treatment. \n\n# Acknowlegement\nFoto von \u003Ca href=\u0022https://unsplash.com/de/@neonbrand?utm_content=creditCopyText\u0026utm_medium=referral\u0026utm_source=unsplash\u0022\u003EKenny Eliason\u003C/a\u003E auf \u003Ca href=\u0022https://unsplash.com/de/fotos/rote-und-gelbe-vogelfigur-MEbT27ZrtdE?utm_content=creditCopyText\u0026utm_medium=referral\u0026utm_source=unsplash\u0022\u003EUnsplash\u003C/a\u003E\n  "
+}
