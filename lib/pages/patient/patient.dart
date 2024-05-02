@@ -45,41 +45,48 @@ class _PatientPageState extends State<PatientPage> {
     Firebase.initializeApp(); // Initialize Firebase
   }
 
-  int serialNumber = 1; // Initial serial number
 
+int serialNumber = 1;
   void generateCode() {
     if (validateFields()) {
-      String newCode = serialNumber
-          .toString()
-          .padLeft(4, '0'); // Format serial number as a four-digit string
-      if (serialNumber <= 9999) {
-        setState(() {
-          generatedCode = newCode;
-          codeController.text = generatedCode;
+      String newCode = ''; // Initialize new code variable
+      bool codeExists = true; // Flag to check if the code exists
+
+      // Loop until a unique code is generated
+      while (codeExists) {
+        newCode = serialNumber.toString().padLeft(4, '0'); // Generate new code
+
+        // Check if the code exists in Firestore
+        FirebaseFirestore.instance
+            .collection('patients')
+            .where('code', isEqualTo: newCode)
+            .get()
+            .then((QuerySnapshot querySnapshot) {
+          if (querySnapshot.docs.isEmpty) {
+            // If the code doesn't exist, set the flag to false
+            codeExists = false;
+          }
         });
-        serialNumber++; // Increment serial number for the next code
-      } else {
-        // Handle the case when the serial number exceeds 9999 (optional)
-        AwesomeDialog(
-          context: context,
-          animType: AnimType.scale,
-          dialogType: DialogType.info,
-          body: const Center(
-            child: Text(
-              "The code has reached it's limit",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          title: 'This is Ignored',
-          desc: 'This is also Ignored',
-          btnOkColor: Colors.deepPurple,
-          btnOkOnPress: () {},
-        ).show();
+
+        // If the code exists, increment the serial number and try again
+        if (codeExists) {
+          serialNumber++;
+        }
       }
+
+      // Set the generated code and update the UI
+      setState(() {
+        generatedCode = newCode;
+        codeController.text = generatedCode;
+      });
+
+      // Increment serial number for the next code
+      serialNumber++;
     } else {
       return null;
     }
   }
+
 
   // Save data to Firestore
   Future<void> saveData() async {

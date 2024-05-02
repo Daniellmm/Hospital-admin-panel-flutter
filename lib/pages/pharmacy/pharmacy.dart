@@ -1,11 +1,109 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:hmsapp/constants/controllers.dart';
 import 'package:hmsapp/helpers/responsiveness.dart';
 import 'package:hmsapp/widgets/custom.dart';
 
-class PharmacyPage extends StatelessWidget {
-  // const OverViewPage ({super.key});
+class PharmacyPage extends StatefulWidget {
+  PharmacyPage({super.key});
+
+  @override
+  State<PharmacyPage> createState() => _PharmacyPageState();
+}
+
+class _PharmacyPageState extends State<PharmacyPage> {
+  TextEditingController fullnameController = TextEditingController();
+  TextEditingController authController = TextEditingController();
+  TextEditingController prescriptionController = TextEditingController();
+
+  // Function to validate if the TextFormField is empty
+  bool validateFields() {
+    return fullnameController.text.isNotEmpty &&
+        authController.text.isNotEmpty &&
+        prescriptionController.text.isNotEmpty;
+        // Controller.text.isNotEmpty;
+        
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Firebase.initializeApp(); // Initialize Firebase
+  }
+
+  int serialNumber = 1; // Initial serial number
+
+  
+  // Save data to Firestore
+  Future<void> saveData() async {
+    if (!validateFields()) {
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.error,
+        body: const Center(
+          child: Text(
+            'Compelete the fields',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: 'This is Ignored',
+        desc: 'This is also Ignored',
+        btnOkColor: Colors.deepPurple,
+        btnOkOnPress: () {},
+      ).show();
+    } else {
+      CollectionReference pharmacy =
+          FirebaseFirestore.instance.collection('pharmacy');
+
+      try {
+        await pharmacy.add({
+          'fullName': fullnameController.text,
+          'Authentication code': authController.text,
+          'Drugs Prescriptions': prescriptionController.text,
+          
+          'Date': Timestamp.now(),
+        });
+        AwesomeDialog(
+          context: context,
+          animType: AnimType.scale,
+          dialogType: DialogType.success,
+          body: Center(
+            child: Text(
+              "",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          title: 'This is Ignored',
+          desc: 'This is also Ignored',
+          btnOkColor: Colors.deepPurple,
+          btnOkOnPress: () {
+            clearFields();
+          },
+        ).show();
+        // Show toast message with generated cod
+        // Toast.show("Generated Code: $generatedCode", );
+      } catch (e) {
+        SnackBar(
+          backgroundColor: Colors.green,
+          content: Text(
+            "",
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        );
+      }
+    }
+  }
+
+// Function to clear all text fields
+  void clearFields() {
+    fullnameController.clear();
+    authController.clear();
+    prescriptionController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +151,7 @@ class PharmacyPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
-                        // controller: firstnameController,
+                        controller: fullnameController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: "Full Name ",
@@ -78,7 +176,7 @@ class PharmacyPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
-                        // controller: lastnameController,
+                        controller: authController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: "Auth Number",
@@ -90,7 +188,7 @@ class PharmacyPage extends StatelessWidget {
                     height: 20,
                   ),
                   const Text(
-                    'Drugs',
+                    'Prescriptions',
                     style: TextStyle(fontSize: 25),
                   ),
                   const SizedBox(
@@ -103,11 +201,11 @@ class PharmacyPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
-                         maxLines: 4,
-                        // controller: emailController,
+                        maxLines: 4,
+                        controller: prescriptionController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: "List of Drug",
+                            hintText: "Prescriptions",
                             hintStyle: TextStyle(color: Colors.grey)),
                       ),
                     ),
