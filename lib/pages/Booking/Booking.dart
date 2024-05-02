@@ -260,7 +260,7 @@ Future<void> BookTime() async {
                     height: 20,
                   ),
                   const Text(
-                    'Consulting Doctor',
+                    'Consultant',
                     style: TextStyle(fontSize: 25),
                   ),
                   const SizedBox(
@@ -276,7 +276,7 @@ Future<void> BookTime() async {
                         controller: consultingController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: "Consulting Doctor",
+                            hintText: "Consultant",
                             hintStyle: TextStyle(color: Colors.grey)),
                       ),
                     ),

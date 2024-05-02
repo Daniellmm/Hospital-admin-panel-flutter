@@ -3,7 +3,7 @@ const PatientsPageRoute = "Add Patients";
 const BookingPageRoute = "Book Appointment";
 const ConsultPageRoute = "Consultation";
 const PharmacyPageRoute = "Pharmacy";
-// const PaymentPageRoute = "Payment";
+const PaymentPageRoute = "Payment";
 const AuthenticationPageRoute = "Authentication";
 
 
@@ -13,6 +13,6 @@ PatientsPageRoute,
 BookingPageRoute,
 ConsultPageRoute,
 PharmacyPageRoute,
-// PaymentPageRoute,
+PaymentPageRoute,
 AuthenticationPageRoute
 ];

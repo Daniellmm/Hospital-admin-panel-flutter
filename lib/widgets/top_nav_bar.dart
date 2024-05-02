@@ -25,18 +25,18 @@ AppBar topNavigationBar(BuildContext context, GlobalKey<ScaffoldState> key) =>
         children: [
           Visibility(
             child: CustomText(
-              text: "H.I.S",
+              text: "MedAd4CHD",
               size: 16,
               weight: FontWeight.bold,
               color: lightGrey,
             ),
           ),
           Expanded(child: Container()),
-          IconButton(
-            icon: Icon(Icons.settings),
-            color: dark.withOpacity(.7),
-            onPressed: () {},
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.settings),
+          //   color: dark.withOpacity(.7),
+          //   onPressed: () {},
+          // ),
           Stack(
             children: [
               IconButton(
@@ -67,7 +67,7 @@ AppBar topNavigationBar(BuildContext context, GlobalKey<ScaffoldState> key) =>
             width: 24,
           ),
           CustomText(
-              text: "Doctor",
+              text: "Admin",
               size: 16,
               color: lightGrey,
               weight: FontWeight.normal),

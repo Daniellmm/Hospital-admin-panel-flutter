@@ -20,8 +20,7 @@ class _PatientPageState extends State<PatientPage> {
   TextEditingController firstnameController = TextEditingController();
   TextEditingController lastnameController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
-  TextEditingController additionalinfoController = TextEditingController();
-  TextEditingController conditionController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController medicalhistoryController = TextEditingController();
@@ -29,15 +28,13 @@ class _PatientPageState extends State<PatientPage> {
   TextEditingController codeController = TextEditingController();
   String generatedCode = '';
 
-
-   // Function to validate if the TextFormField is empty
+  // Function to validate if the TextFormField is empty
   bool validateFields() {
     return firstnameController.text.isNotEmpty &&
         lastnameController.text.isNotEmpty &&
         mobileController.text.isNotEmpty &&
         ageController.text.isNotEmpty &&
-        additionalinfoController.text.isNotEmpty &&
-        conditionController.text.isNotEmpty &&
+        emailController.text.isNotEmpty&&
         addressController.text.isNotEmpty &&
         medicalhistoryController.text.isNotEmpty;
   }
@@ -50,8 +47,8 @@ class _PatientPageState extends State<PatientPage> {
 
   int serialNumber = 1; // Initial serial number
 
-  void generateCode() { 
-    if (validateFields()){
+  void generateCode() {
+    if (validateFields()) {
       String newCode = serialNumber
           .toString()
           .padLeft(4, '0'); // Format serial number as a four-digit string
@@ -79,15 +76,14 @@ class _PatientPageState extends State<PatientPage> {
           btnOkOnPress: () {},
         ).show();
       }
-    }else{
+    } else {
       return null;
     }
   }
-  
+
   // Save data to Firestore
   Future<void> saveData() async {
-   
-   if (!validateFields()) {
+    if (!validateFields()) {
       AwesomeDialog(
         context: context,
         animType: AnimType.scale,
@@ -106,7 +102,7 @@ class _PatientPageState extends State<PatientPage> {
     } else {
       CollectionReference patients =
           FirebaseFirestore.instance.collection('patients');
-
+https: //github.com/Daniellmm/hospital-admin-panel
       try {
         await patients.add({
           'firstName': firstnameController.text,
@@ -114,11 +110,11 @@ class _PatientPageState extends State<PatientPage> {
           'gender': genderValue,
           'age': ageController.text,
           'mobile': mobileController.text,
-          'additionalInfo': additionalinfoController.text,
-          'condition': conditionController.text,
+          'email': emailController.text,
           'address': addressController.text,
           'medicalHistory': medicalhistoryController.text,
           'code': generatedCode,
+          'registrationDate': Timestamp.now(),
         });
         AwesomeDialog(
           context: context,
@@ -157,8 +153,7 @@ class _PatientPageState extends State<PatientPage> {
     firstnameController.clear();
     lastnameController.clear();
     mobileController.clear();
-    additionalinfoController.clear();
-    conditionController.clear();
+    emailController.clear();
     addressController.clear();
     medicalhistoryController.clear();
     ageController.clear();
@@ -311,6 +306,32 @@ class _PatientPageState extends State<PatientPage> {
                     height: 20,
                   ),
                   const Text(
+                    'Email',
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.deepPurple),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                      child: TextFormField(
+                        controller: emailController,
+                        decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Email",
+                            hintStyle: TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
                     'Mobile number',
                     style: TextStyle(fontSize: 25),
                   ),
@@ -416,56 +437,6 @@ class _PatientPageState extends State<PatientPage> {
                   //     }).toList(),
                   //   ),
                   // ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    'Addtional Info',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.deepPurple),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(
-                      child: TextFormField(
-                        controller: additionalinfoController,
-                        decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Addtional Info",
-                            hintStyle: TextStyle(color: Colors.grey)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    'Injury/Condition',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.deepPurple),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(
-                      child: TextFormField(
-                        controller: conditionController,
-                        decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Injury/Condition",
-                            hintStyle: TextStyle(color: Colors.grey)),
-                      ),
-                    ),
-                  ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -578,5 +549,3 @@ class _PatientPageState extends State<PatientPage> {
     );
   }
 }
-
-class LENGTH_LONG {}

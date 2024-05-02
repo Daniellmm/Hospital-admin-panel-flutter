@@ -98,7 +98,7 @@ class _ConsultPageState extends State<ConsultPage> {
         btnOkOnPress: () {},
       ).show();
     } else {
-      var url = 'http://192.168.249.253:3004/predict';
+      var url = 'http://192.168.127.253:3004/predict';
 
       final response = await http.post(
         Uri.parse(url),
@@ -130,7 +130,7 @@ class _ConsultPageState extends State<ConsultPage> {
           dialogType: DialogType.success,
           body: Center(
             child: Text(
-              'Low percentage of heart diease   $responseData',
+              '$responseData',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
