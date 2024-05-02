@@ -102,7 +102,7 @@ class _PatientPageState extends State<PatientPage> {
     } else {
       CollectionReference patients =
           FirebaseFirestore.instance.collection('patients');
-https: //github.com/Daniellmm/hospital-admin-panel
+
       try {
         await patients.add({
           'firstName': firstnameController.text,
