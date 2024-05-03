@@ -7,8 +7,6 @@ import 'package:hmsapp/constants/controllers.dart';
 import 'package:hmsapp/helpers/responsiveness.dart';
 import 'package:hmsapp/widgets/custom.dart';
 import 'package:intl/intl.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
 
 class BookingPage extends StatefulWidget {
        BookingPage ({super.key});
@@ -22,6 +20,7 @@ class _BookingPageState extends State<BookingPage> {
 
   TextEditingController firstnameController = TextEditingController();
   TextEditingController lastnameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
   TextEditingController consultingController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController symptomController = TextEditingController();
@@ -38,6 +37,7 @@ Future<void> BookTime() async {
     bool validateFields() {
       return firstnameController.text.isNotEmpty &&
           lastnameController.text.isNotEmpty &&
+          phoneController.text.isNotEmpty &&
           emailController.text.isNotEmpty&&
           consultingController.text.isNotEmpty&&
           dateController.text.isNotEmpty&&
@@ -70,6 +70,7 @@ Future<void> BookTime() async {
           'firstName': firstnameController.text,
           'lastName': lastnameController.text,
           'email': emailController.text,
+          'phoneNumber': phoneController.text,
           'consulting Doctor': consultingController.text,
           'date': dateController.text,
           'symptoms': symptomController.text,
@@ -78,16 +79,30 @@ Future<void> BookTime() async {
          
         });
 
-         sendEmail(); // Send email after adding to Firestore
 
+        // // Send an SMS with the booking details
+        // SmsSender sender = SmsSender();
+        // SmsMessage message = SmsMessage(
+        //   '+1234567890', // Replace with the phone number you want to send the SMS to
+        //   'Booking Details: \n' +
+        //       'Name: ${firstnameController.text} ${lastnameController.text}\n' +
+        //       'Email: ${emailController.text}\n' +
+        //       'Phone: ${phoneController.text}\n' +
+        //       'Consulting Doctor: ${consultingController.text}\n' +
+        //       'Date: ${dateController.text}\n' +
+        //       'Symptoms: ${symptomController.text}\n' +
+        //       'Note: ${noteController.text}',
+        // );
+        // sender.sendSms(message);
+
+        // Show success dialog after sending SMS
         AwesomeDialog(
           context: context,
           animType: AnimType.scale,
           dialogType: DialogType.success,
           body: Center(
             child: Text(
-              "Appointment Booked Successfully" ,
-                  
+              "Appointment Booked Successfully. SMS Sent!",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -98,8 +113,6 @@ Future<void> BookTime() async {
             clearFields();
           },
         ).show();
-        // Show toast message with generated cod
-        // Toast.show("Generated Code: $generatedCode", );
       }
        catch (e) {
         SnackBar(
@@ -113,31 +126,12 @@ Future<void> BookTime() async {
     }
   }
 
-  void sendEmail() async {
-    final smtpServer = gmail('idowudanielcsc190400@gmail.com', 'wihnwtdcykgtnjfh');
-
-    // Create our message.
-    final message = Message()
-      ..from = Address('your_email@example.com', 'Health Management')
-      ..recipients.add(emailController.text)
-      ..subject = 'Booking Confirmation'
-      ..text = 'Dear ${firstnameController.text} ${lastnameController.text},\n\n'
-          'Your appointment with Dr. ${consultingController.text} on ${dateController.text} has been successfully booked.\n\n'
-          'Symptoms: ${symptomController.text}\n\n'
-          'Note: ${noteController.text}';
-
-    try {
-      final sendReport = await send(message, smtpServer);
-      print('Message sent: ' + sendReport.toString());
-    } catch (e) {
-      print('Error occurred: $e');
-    }
-  }
-
+  
 
    void clearFields() {
     firstnameController.clear();
     lastnameController.clear();
+    phoneController.clear();
     emailController.clear();
     consultingController.clear();
     dateController.clear();
@@ -252,6 +246,32 @@ Future<void> BookTime() async {
                         decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: "Email",
+                            hintStyle: TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
+                    'Phone Number',
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.deepPurple),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                      child: TextFormField(
+                        controller: phoneController,
+                        decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Phone Number",
                             hintStyle: TextStyle(color: Colors.grey)),
                       ),
                     ),

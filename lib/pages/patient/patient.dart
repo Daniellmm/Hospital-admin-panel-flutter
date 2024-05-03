@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math';
 import 'package:get/get.dart';
 import 'package:hmsapp/constants/controllers.dart';
@@ -49,35 +50,16 @@ class _PatientPageState extends State<PatientPage> {
 
 
 
-void generateCode() {
-  if (validateFields()) {
-    String newCode = ''; // Initialize new code variable
+ String generateCode() {
+    // Generate a random 4-digit number
+    Random random = Random();
+    int randomNumber = random.nextInt(9000) + 1000;
 
-    // Loop until a unique code is generated
-    while (true) {
-      // Generate a random four-digit code between 1000 and 9999
-      newCode = (1000 + Random().nextInt(9000)).toString();
+    // Convert the random number to a string
+    String code = randomNumber.toString();
 
-      // Check if the code exists in Firestore
-      FirebaseFirestore.instance
-          .collection('patients')
-          .where('code', isEqualTo: newCode)
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        if (querySnapshot.docs.isEmpty) {
-          // If the code doesn't exist, update the UI and exit the loop
-          setState(() {
-            generatedCode = newCode;
-            codeController.text = generatedCode;
-          });
-          return;
-        }
-      });
-    }
-  } else {
-    return null;
+    return code;
   }
-}
 
 
   // Save data to Firestore
@@ -103,6 +85,8 @@ void generateCode() {
           FirebaseFirestore.instance.collection('patients');
 
       try {
+         String generatedCode = generateCode(); // Generate unique code
+          codeController.text = generatedCode;
         await patients.add({
           'firstName': firstnameController.text,
           'lastName': lastnameController.text,
@@ -293,6 +277,11 @@ void generateCode() {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[0-9]')), // Allow only numbers
+                        ],
+                        keyboardType: TextInputType.number,
                         controller: ageController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
@@ -344,6 +333,11 @@ void generateCode() {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[0-9]')), // Allow only numbers
+                        ],
+                        keyboardType: TextInputType.number,
                         controller: mobileController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
@@ -398,47 +392,7 @@ void generateCode() {
                   const SizedBox(
                     height: 20,
                   ),
-                  // const Text(
-                  //   'Blood Group',
-                  //   style: TextStyle(fontSize: 25),
-                  // ),
-                  // const SizedBox(
-                  //   height: 20,
-                  // ),
-                  // Container(
-                  //   padding: const EdgeInsets.all(8),
-                  //   width: MediaQuery.of(context).size.width,
-                  //   decoration: BoxDecoration(
-                  //       border: Border.all(color: Colors.deepPurple),
-                  //       borderRadius: BorderRadius.circular(10),
-                  //       color: Colors.transparent),
-                  //   child: DropdownButton<String>(
-                  //     value: dropdownValue2,
-                  //     onChanged: (String? newValue) {
-                  //       setState(() {
-                  //         dropdownValue2 = newValue!;
-                  //       });
-                  //     },
-                  //     items: <String>[
-                  //       'A+',
-                  //       'A-',
-                  //       'B+',
-                  //       'B-',
-                  //       'AB+',
-                  //       'AB-',
-                  //       'O+',
-                  //       'O-',
-                  //     ].map<DropdownMenuItem<String>>((String value) {
-                  //       return DropdownMenuItem<String>(
-                  //         value: value,
-                  //         child: Text(value),
-                  //       );
-                  //     }).toList(),
-                  //   ),
-                  // ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                 
                   const Text(
                     'Address',
                     style: TextStyle(fontSize: 25),
