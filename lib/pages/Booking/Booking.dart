@@ -9,15 +9,13 @@ import 'package:hmsapp/widgets/custom.dart';
 import 'package:intl/intl.dart';
 
 class BookingPage extends StatefulWidget {
-       BookingPage ({super.key});
+  BookingPage({super.key});
 
   @override
   State<BookingPage> createState() => _BookingPageState();
 }
- 
 
 class _BookingPageState extends State<BookingPage> {
-
   TextEditingController firstnameController = TextEditingController();
   TextEditingController lastnameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -32,27 +30,29 @@ class _BookingPageState extends State<BookingPage> {
     super.initState();
     Firebase.initializeApp(); // Initialize Firebase
   }
-Future<void> BookTime() async {
+
+ Future<void> BookTime() async {
     // Function to validate if the TextFormField is empty
     bool validateFields() {
       return firstnameController.text.isNotEmpty &&
           lastnameController.text.isNotEmpty &&
           phoneController.text.isNotEmpty &&
-          emailController.text.isNotEmpty&&
-          consultingController.text.isNotEmpty&&
-          dateController.text.isNotEmpty&&
-          symptomController.text.isNotEmpty&&
-          noteController.text.isNotEmpty  ;
+          emailController.text.isNotEmpty &&
+          consultingController.text.isNotEmpty &&
+          dateController.text.isNotEmpty &&
+          symptomController.text.isNotEmpty &&
+          noteController.text.isNotEmpty;
     }
 
     if (!validateFields()) {
+      // Show error dialog if any field is empty
       AwesomeDialog(
         context: context,
         animType: AnimType.scale,
         dialogType: DialogType.error,
         body: const Center(
           child: Text(
-            'Compelete the fields',
+            'Complete the fields',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -66,7 +66,8 @@ Future<void> BookTime() async {
           FirebaseFirestore.instance.collection('bookings');
 
       try {
-        await bookings.add({
+        // Add the details to Firestore
+        DocumentReference result = await bookings.add({
           'firstName': firstnameController.text,
           'lastName': lastnameController.text,
           'email': emailController.text,
@@ -76,24 +77,9 @@ Future<void> BookTime() async {
           'symptoms': symptomController.text,
           'note': noteController.text,
           'Dateofappointment': Timestamp.now(),
-         
         });
 
-
-        // // Send an SMS with the booking details
-        // SmsSender sender = SmsSender();
-        // SmsMessage message = SmsMessage(
-        //   '+1234567890', // Replace with the phone number you want to send the SMS to
-        //   'Booking Details: \n' +
-        //       'Name: ${firstnameController.text} ${lastnameController.text}\n' +
-        //       'Email: ${emailController.text}\n' +
-        //       'Phone: ${phoneController.text}\n' +
-        //       'Consulting Doctor: ${consultingController.text}\n' +
-        //       'Date: ${dateController.text}\n' +
-        //       'Symptoms: ${symptomController.text}\n' +
-        //       'Note: ${noteController.text}',
-        // );
-        // sender.sendSms(message);
+       
 
         // Show success dialog after sending SMS
         AwesomeDialog(
@@ -113,22 +99,22 @@ Future<void> BookTime() async {
             clearFields();
           },
         ).show();
-      }
-       catch (e) {
-        SnackBar(
-          backgroundColor: Colors.green,
-          content: Text(
-            "",
-            style: TextStyle(fontSize: 20, color: Colors.white),
+      } catch (e) {
+        // Show error snackbar if Firestore operation fails
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+              "Error: $e",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
           ),
         );
       }
     }
   }
 
-  
-
-   void clearFields() {
+  void clearFields() {
     firstnameController.clear();
     lastnameController.clear();
     phoneController.clear();
@@ -138,9 +124,6 @@ Future<void> BookTime() async {
     symptomController.clear();
     noteController.clear();
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +171,7 @@ Future<void> BookTime() async {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
-                       controller: firstnameController,
+                        controller: firstnameController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: "First Name",
@@ -402,7 +385,7 @@ Future<void> BookTime() async {
                   const SizedBox(height: 10),
                   const SizedBox(height: 10),
                   InkWell(
-                    onTap: (){
+                    onTap: () {
                       BookTime();
                     },
                     child: Container(

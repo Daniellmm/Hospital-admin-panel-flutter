@@ -18,6 +18,7 @@ class _PharmacyPageState extends State<PharmacyPage> {
   TextEditingController fullnameController = TextEditingController();
   TextEditingController authController = TextEditingController();
   TextEditingController prescriptionController = TextEditingController();
+  String patientName = '';
 
   // Function to validate if the TextFormField is empty
   bool validateFields() {
@@ -104,6 +105,40 @@ class _PharmacyPageState extends State<PharmacyPage> {
     authController.clear();
     prescriptionController.clear();
   }
+
+
+// Function to fetch patient data based on authentication code
+  Future<void> fetchPatientData(String authCode) async {
+    try {
+      // Query Firestore for patient data with matching authentication code
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('patients')
+              .where('authCode', isEqualTo: authCode)
+              .limit(1)
+              .get();
+
+      // If a patient with the provided auth code exists
+      if (querySnapshot.docs.isNotEmpty) {
+        setState(() {
+          // Update patient name variable with the fetched patient's name
+          patientName = querySnapshot.docs.first['fullName'];
+        });
+      } else {
+        setState(() {
+          // Clear patient name if no matching patient is found
+          patientName = '';
+        });
+      }
+    } catch (error) {
+      print("Error fetching patient data: $error");
+    }
+  }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
