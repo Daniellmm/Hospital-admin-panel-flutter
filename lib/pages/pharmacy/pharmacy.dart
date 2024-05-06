@@ -8,7 +8,7 @@ import 'package:hmsapp/helpers/responsiveness.dart';
 import 'package:hmsapp/widgets/custom.dart';
 
 class PharmacyPage extends StatefulWidget {
-  PharmacyPage({super.key});
+  const PharmacyPage({super.key});
 
   @override
   State<PharmacyPage> createState() => _PharmacyPageState();
@@ -18,26 +18,27 @@ class _PharmacyPageState extends State<PharmacyPage> {
   TextEditingController fullnameController = TextEditingController();
   TextEditingController authController = TextEditingController();
   TextEditingController prescriptionController = TextEditingController();
-  String patientName = '';
+  Stream<DocumentSnapshot>? patientStream;
 
   // Function to validate if the TextFormField is empty
   bool validateFields() {
     return fullnameController.text.isNotEmpty &&
         authController.text.isNotEmpty &&
         prescriptionController.text.isNotEmpty;
-        // Controller.text.isNotEmpty;
-        
+    // Controller.text.isNotEmpty;
   }
 
   @override
   void initState() {
     super.initState();
-    Firebase.initializeApp(); // Initialize Firebase
+    Firebase.initializeApp().then((_) {
+      // Initialize Firebase
+      print('Firebase initialized');
+    }).catchError((error) {
+      print('Failed to initialize Firebase: $error');
+    });
   }
 
-  int serialNumber = 1; // Initial serial number
-
-  
   // Save data to Firestore
   Future<void> saveData() async {
     if (!validateFields()) {
@@ -65,16 +66,16 @@ class _PharmacyPageState extends State<PharmacyPage> {
           'fullName': fullnameController.text,
           'Authentication code': authController.text,
           'Drugs Prescriptions': prescriptionController.text,
-          
           'Date': Timestamp.now(),
         });
         AwesomeDialog(
+          // ignore: use_build_context_synchronously
           context: context,
           animType: AnimType.scale,
           dialogType: DialogType.success,
-          body: Center(
+          body: const Center(
             child: Text(
-              "",
+              "Information saved Proceed to Payment",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -88,7 +89,7 @@ class _PharmacyPageState extends State<PharmacyPage> {
         // Show toast message with generated cod
         // Toast.show("Generated Code: $generatedCode", );
       } catch (e) {
-        SnackBar(
+        const SnackBar(
           backgroundColor: Colors.green,
           content: Text(
             "",
@@ -105,40 +106,6 @@ class _PharmacyPageState extends State<PharmacyPage> {
     authController.clear();
     prescriptionController.clear();
   }
-
-
-// Function to fetch patient data based on authentication code
-  Future<void> fetchPatientData(String authCode) async {
-    try {
-      // Query Firestore for patient data with matching authentication code
-      QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance
-              .collection('patients')
-              .where('authCode', isEqualTo: authCode)
-              .limit(1)
-              .get();
-
-      // If a patient with the provided auth code exists
-      if (querySnapshot.docs.isNotEmpty) {
-        setState(() {
-          // Update patient name variable with the fetched patient's name
-          patientName = querySnapshot.docs.first['fullName'];
-        });
-      } else {
-        setState(() {
-          // Clear patient name if no matching patient is found
-          patientName = '';
-        });
-      }
-    } catch (error) {
-      print("Error fetching patient data: $error");
-    }
-  }
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -173,6 +140,36 @@ class _PharmacyPageState extends State<PharmacyPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
+                    'Auth Number',
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFormField(
+                          controller: authController,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Auth Number',
+                            hintStyle: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
                     'Full Name',
                     style: TextStyle(fontSize: 25),
                   ),
@@ -197,31 +194,7 @@ class _PharmacyPageState extends State<PharmacyPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  const Text(
-                    'Auth Number',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.deepPurple),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(
-                      child: TextFormField(
-                        controller: authController,
-                        decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Auth Number",
-                            hintStyle: TextStyle(color: Colors.grey)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+
                   const Text(
                     'Prescriptions',
                     style: TextStyle(fontSize: 25),
@@ -278,7 +251,7 @@ class _PharmacyPageState extends State<PharmacyPage> {
                   const SizedBox(height: 10),
                   InkWell(
                     onTap: () {
-                      // BookTime();
+                      saveData();
                     },
                     child: Container(
                       height: 50,

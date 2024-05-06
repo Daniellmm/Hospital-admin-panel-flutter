@@ -13,6 +13,8 @@ class AvailableDriversTableState extends State<AvailableDriversTable> {
   late Query patientsQuery;
   final int itemsPerPage = 5;
   DocumentSnapshot? lastDocument;
+  final ScrollController _scrollController = ScrollController();
+  int currentPage = 1;
 
   @override
   void initState() {
@@ -22,17 +24,28 @@ class AvailableDriversTableState extends State<AvailableDriversTable> {
         .collection('patients')
         .orderBy('code')
         .limit(itemsPerPage);
+    _scrollController.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
     searchController.dispose();
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      loadMorePatients();
+    }
   }
 
   void loadMorePatients() {
     if (lastDocument != null) {
       setState(() {
+        currentPage++;
         patientsQuery = FirebaseFirestore.instance
             .collection('patients')
             .orderBy('code')
@@ -42,9 +55,20 @@ class AvailableDriversTableState extends State<AvailableDriversTable> {
     }
   }
 
+  void goToPage(int page) {
+    setState(() {
+      currentPage = page;
+      patientsQuery = FirebaseFirestore.instance
+          .collection('patients')
+          .orderBy('code')
+          .limit(itemsPerPage * page);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: _scrollController,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -162,9 +186,35 @@ class AvailableDriversTableState extends State<AvailableDriversTable> {
               );
             },
           ),
-          ElevatedButton(
-            onPressed: loadMorePatients,
-            child: Text('Load More'),
+          const SizedBox(
+            height: 30,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed:
+                    currentPage > 1 ? () => goToPage(currentPage - 1) : null,
+              ),
+              for (int i = 1; i <= currentPage; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: TextButton(
+                    onPressed: () => goToPage(i),
+                    child: Text(
+                      i.toString(),
+                      style: TextStyle(
+                        color: i == currentPage ? Colors.blue : null,
+                      ),
+                    ),
+                  ),
+                ),
+              IconButton(
+                icon: Icon(Icons.arrow_forward),
+                onPressed: () => loadMorePatients(),
+              ),
+            ],
           ),
         ],
       ),

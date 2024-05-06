@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hmsapp/pages/dashboard/widgets/info_card.dart';
 
 class OverviewCardsMediumScreen extends StatefulWidget {
-  const OverviewCardsMediumScreen({super.key});
+  const OverviewCardsMediumScreen({Key? key});
 
   @override
   State<OverviewCardsMediumScreen> createState() =>
@@ -11,10 +11,9 @@ class OverviewCardsMediumScreen extends StatefulWidget {
 }
 
 class _OverviewCardsMediumScreenState extends State<OverviewCardsMediumScreen> {
-
-   int newPatientsCount = 0;
+  int newPatientsCount = 0;
   int appointmentCount = 0;
-  int operationsCount = 0;
+  int consultationCount = 0;
   int totalPatientsThisWeek = 0; // Added totalPatientsThisWeek variable
 
   @override
@@ -22,7 +21,7 @@ class _OverviewCardsMediumScreenState extends State<OverviewCardsMediumScreen> {
     super.initState();
     // Call functions to fetch data from Firestore and update counts
     fetchAppointmentCount();
-    fetchOperationsCount();
+    fetchConsultationCount();
     fetchTotalPatientsThisWeek(); // Call the function to fetch total patients this week
     // Listen for changes in patients collection
     FirebaseFirestore.instance
@@ -54,37 +53,59 @@ class _OverviewCardsMediumScreenState extends State<OverviewCardsMediumScreen> {
   }
 
   Future<void> fetchAppointmentCount() async {
-    // Retrieve data from Firestore
-    QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('bookings').get();
+    // Calculate the start and end of the current day
+    DateTime now = DateTime.now();
+    DateTime startOfDay = DateTime(now.year, now.month, now.day);
+    DateTime endOfDay = startOfDay.add(Duration(days: 1));
 
-    // Update the count of appointments
+    // Retrieve data from Firestore
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('bookings')
+        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
+        .where('dateTime', isLessThan: endOfDay)
+        .get();
+
+    // Update the count of appointments for today
     setState(() {
       appointmentCount = snapshot.docs.length;
     });
   }
 
-  Future<void> fetchOperationsCount() async {
-    // Retrieve data from Firestore
-    QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('predictions').get();
+  Future<void> fetchConsultationCount() async {
+    // Calculate the start and end of the current day
+    DateTime now = DateTime.now();
+    DateTime startOfDay = DateTime(now.year, now.month, now.day);
+    DateTime endOfDay = startOfDay.add(Duration(days: 1));
 
-    // Update the count of operations
+    // Retrieve data from Firestore
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('consultations')
+        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
+        .where('dateTime', isLessThan: endOfDay)
+        .get();
+
+    // Update the count of consultations for today
     setState(() {
-      operationsCount = snapshot.docs.length;
+      consultationCount = snapshot.docs.length;
     });
   }
 
-  Future<void> fetchTotalPatientsThisWeek() async {
+ Future<void> fetchTotalPatientsThisWeek() async {
     // Calculate the start date of the current week (assuming week starts on Sunday)
     DateTime now = DateTime.now();
-    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday));
+
+    // Calculate the end date of the current week
+    DateTime endOfWeek = startOfWeek.add(Duration(days: 7));
 
     // Retrieve data from Firestore
     QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
         .instance
         .collection('patients')
         .where('registrationDate', isGreaterThanOrEqualTo: startOfWeek)
+        .where('registrationDate', isLessThan: endOfWeek)
         .get();
 
     // Update the count of total patients this week
@@ -92,6 +113,8 @@ class _OverviewCardsMediumScreenState extends State<OverviewCardsMediumScreen> {
       totalPatientsThisWeek = snapshot.docs.length;
     });
   }
+
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -125,7 +148,7 @@ class _OverviewCardsMediumScreenState extends State<OverviewCardsMediumScreen> {
           children: [
             InfoCard(
               title: "Consultation",
-              value: operationsCount.toString(),
+              value: consultationCount.toString(),
               topColor: Colors.redAccent,
               onTap: () {},
             ),

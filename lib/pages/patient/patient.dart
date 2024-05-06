@@ -11,7 +11,7 @@ import 'package:hmsapp/widgets/custom.dart';
 import 'package:intl/intl.dart';
 
 class PatientPage extends StatefulWidget {
-  PatientPage({super.key});
+  const PatientPage({super.key});
 
   @override
   State<PatientPage> createState() => _PatientPageState();
@@ -100,14 +100,14 @@ class _PatientPageState extends State<PatientPage> {
           'registrationDate': Timestamp.now(),
         });
         AwesomeDialog(
+          // ignore: use_build_context_synchronously
           context: context,
           animType: AnimType.scale,
           dialogType: DialogType.success,
           body: Center(
             child: Text(
-              "User Info saved successfully and Your Authetication code is " +
-                  generatedCode,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              "User Info saved successfully and Your Authetication code is $generatedCode",
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           title: 'This is Ignored',
@@ -124,7 +124,7 @@ class _PatientPageState extends State<PatientPage> {
           backgroundColor: Colors.green,
           content: Text(
             "Generated Code: $generatedCode",
-            style: TextStyle(fontSize: 20, color: Colors.white),
+            style: const TextStyle(fontSize: 20, color: Colors.white),
           ),
         );
       }
