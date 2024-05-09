@@ -100,6 +100,7 @@ class _ConsultPageState extends State<ConsultPage> {
       ).show();
     } else {
       var url = 'http://192.168.127.253:3004/predict';
+      // var url = 'https://stocka.anettcom.com/ai/';
 
       final response = await http.post(
         Uri.parse(url),
@@ -290,6 +291,32 @@ class _ConsultPageState extends State<ConsultPage> {
                   const SizedBox(
                     height: 20,
                   ),
+                  const Text(
+                    'Chest Pain type',
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.deepPurple),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                      child: TextFormField(
+                        controller: chestController,
+                        decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Chest pain type",
+                            hintStyle: TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
 
                   const Text(
                     'Resting Blood pressure',
@@ -341,28 +368,6 @@ class _ConsultPageState extends State<ConsultPage> {
                   ),
                   const SizedBox(
                     height: 20,
-                  ),
-                  const Text(
-                    'Chest Pain type',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.deepPurple),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(
-                      child: TextFormField(
-                        controller: chestController,
-                        decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Chest pain type",
-                            hintStyle: TextStyle(color: Colors.grey)),
-                      ),
-                    ),
                   ),
 
                   const Text(
@@ -460,29 +465,6 @@ class _ConsultPageState extends State<ConsultPage> {
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    'ST slope',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.deepPurple),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(
-                      child: TextFormField(
-                        controller: stController,
-                        decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "ST segment",
-                            hintStyle: TextStyle(color: Colors.grey)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
                     'Old Peak',
                     style: TextStyle(fontSize: 25),
                   ),
@@ -504,6 +486,30 @@ class _ConsultPageState extends State<ConsultPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'ST slope',
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.deepPurple),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                      child: TextFormField(
+                        controller: stController,
+                        decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "ST segment",
+                            hintStyle: TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                  ),
+                  
                   const SizedBox(height: 20),
                   InkWell(
                     onTap: () {
