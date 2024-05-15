@@ -28,6 +28,7 @@ class _OverviewCardsLargeScreenState extends State<OverviewCardsLargeScreen> {
         .collection('patients')
         .snapshots()
         .listen((event) {
+      fetchAppointmentCount(); // Update appointment count whenever patient collection changes
       fetchNewPatientsCount();
     });
   }
@@ -52,25 +53,28 @@ class _OverviewCardsLargeScreenState extends State<OverviewCardsLargeScreen> {
     });
   }
 
-  Future<void> fetchAppointmentCount() async {
-    // Calculate the start and end of the current day
-    DateTime now = DateTime.now();
-    DateTime startOfDay = DateTime(now.year, now.month, now.day);
-    DateTime endOfDay = startOfDay.add(Duration(days: 1));
+ Future<void> fetchAppointmentCount() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('patients').get();
 
-    // Retrieve data from Firestore
-    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-        .instance
-        .collection('bookings')
-        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
-        .where('dateTime', isLessThan: endOfDay)
-        .get();
+    int count = 0;
 
-    // Update the count of appointments for today
+    // Iterate through each patient document
+    snapshot.docs.forEach((doc) {
+      // Check if the document contains a 'booking' field and it's an array
+      if (doc.data().containsKey('booking') && doc['booking'] is List) {
+        // Increment count by the length of the 'booking' array
+        count += (doc['booking'] as List).length;
+      }
+    });
+
+    // Update the appointment count
     setState(() {
-      appointmentCount = snapshot.docs.length;
+      appointmentCount = count;
     });
   }
+
+
 
   Future<void> fetchConsultationCount() async {
     // Calculate the start and end of the current day
@@ -81,9 +85,9 @@ class _OverviewCardsLargeScreenState extends State<OverviewCardsLargeScreen> {
     // Retrieve data from Firestore
     QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
         .instance
-        .collection('consultations')
-        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
-        .where('dateTime', isLessThan: endOfDay)
+        .collection('patients')
+        .where('consultationDate', isGreaterThanOrEqualTo: startOfDay)
+        .where('consultationDate', isLessThan: endOfDay)
         .get();
 
     // Update the count of consultations for today
@@ -113,7 +117,6 @@ class _OverviewCardsLargeScreenState extends State<OverviewCardsLargeScreen> {
       totalPatientsThisWeek = snapshot.docs.length;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {

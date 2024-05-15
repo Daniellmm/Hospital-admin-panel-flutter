@@ -25,7 +25,7 @@ class _PatientPageState extends State<PatientPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController dateController = TextEditingController();
-  TextEditingController medicalhistoryController = TextEditingController();
+  // TextEditingController medicalhistoryController = TextEditingController();
   TextEditingController ageController = TextEditingController();
   TextEditingController codeController = TextEditingController();
   String generatedCode = '';
@@ -36,9 +36,9 @@ class _PatientPageState extends State<PatientPage> {
         lastnameController.text.isNotEmpty &&
         mobileController.text.isNotEmpty &&
         ageController.text.isNotEmpty &&
-        emailController.text.isNotEmpty&&
-        addressController.text.isNotEmpty &&
-        medicalhistoryController.text.isNotEmpty;
+        emailController.text.isNotEmpty &&
+        addressController.text.isNotEmpty;
+    // medicalhistoryController.text.isNotEmpty;
   }
 
   @override
@@ -47,10 +47,7 @@ class _PatientPageState extends State<PatientPage> {
     Firebase.initializeApp(); // Initialize Firebase
   }
 
-
-
-
- String generateCode() {
+  String generateCode() {
     // Generate a random 4-digit number
     Random random = Random();
     int randomNumber = random.nextInt(9000) + 1000;
@@ -60,7 +57,6 @@ class _PatientPageState extends State<PatientPage> {
 
     return code;
   }
-
 
   // Save data to Firestore
   Future<void> saveData() async {
@@ -85,8 +81,8 @@ class _PatientPageState extends State<PatientPage> {
           FirebaseFirestore.instance.collection('patients');
 
       try {
-         String generatedCode = generateCode(); // Generate unique code
-          codeController.text = generatedCode;
+        String generatedCode = generateCode(); // Generate unique code
+        codeController.text = generatedCode;
         await patients.add({
           'firstName': firstnameController.text,
           'lastName': lastnameController.text,
@@ -95,7 +91,7 @@ class _PatientPageState extends State<PatientPage> {
           'mobile': mobileController.text,
           'email': emailController.text,
           'address': addressController.text,
-          'medicalHistory': medicalhistoryController.text,
+          // 'medicalHistory': medicalhistoryController.text,
           'code': generatedCode,
           'registrationDate': Timestamp.now(),
         });
@@ -138,7 +134,7 @@ class _PatientPageState extends State<PatientPage> {
     mobileController.clear();
     emailController.clear();
     addressController.clear();
-    medicalhistoryController.clear();
+    // medicalhistoryController.clear();
     ageController.clear();
     codeController.clear();
     dateController.clear;
@@ -225,7 +221,6 @@ class _PatientPageState extends State<PatientPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(
                     height: 20,
                   ),
@@ -259,7 +254,6 @@ class _PatientPageState extends State<PatientPage> {
                       }).toList(),
                     ),
                   ),
-
                   const SizedBox(
                     height: 20,
                   ),
@@ -315,7 +309,6 @@ class _PatientPageState extends State<PatientPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(
                     height: 20,
                   ),
@@ -392,7 +385,6 @@ class _PatientPageState extends State<PatientPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                 
                   const Text(
                     'Address',
                     style: TextStyle(fontSize: 25),
@@ -419,29 +411,29 @@ class _PatientPageState extends State<PatientPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  const Text(
-                    'Medical History',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.deepPurple),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Center(
-                      child: TextFormField(
-                        maxLines: 6,
-                        controller: medicalhistoryController,
-                        decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Medical History",
-                            hintStyle: TextStyle(color: Colors.grey)),
-                      ),
-                    ),
-                  ),
+                  // const Text(
+                  //   'Medical History',
+                  //   style: TextStyle(fontSize: 25),
+                  // ),
+                  // const SizedBox(
+                  //   height: 15,
+                  // ),
+                  // Container(
+                  //   padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
+                  //   decoration: BoxDecoration(
+                  //       border: Border.all(color: Colors.deepPurple),
+                  //       borderRadius: BorderRadius.circular(10)),
+                  //   child: Center(
+                  //     child: TextFormField(
+                  //       maxLines: 6,
+                  //       controller: medicalhistoryController,
+                  //       decoration: const InputDecoration(
+                  //           border: InputBorder.none,
+                  //           hintText: "Medical History",
+                  //           hintStyle: TextStyle(color: Colors.grey)),
+                  //     ),
+                  //   ),
+                  // ),
                   const SizedBox(
                     height: 20,
                   ),

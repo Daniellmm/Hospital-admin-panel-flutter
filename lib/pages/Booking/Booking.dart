@@ -121,6 +121,7 @@ class _BookingPageState extends State<BookingPage> {
       return;
     }
 
+    
     try {
       await FirebaseFirestore.instance
           .collection('patients')

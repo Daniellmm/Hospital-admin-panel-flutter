@@ -32,6 +32,7 @@ class _ConsultPageState extends State<ConsultPage> {
   final TextEditingController exerciseController = TextEditingController();
   final TextEditingController stController = TextEditingController();
   final TextEditingController oldpeakController = TextEditingController();
+  String? _patientDocumentId;
 
   @override
   void initState() {
@@ -39,35 +40,149 @@ class _ConsultPageState extends State<ConsultPage> {
     Firebase.initializeApp(); // Initialize Firebase
   }
 
-  Future<void> SavePredition() async {
-    CollectionReference predictions =
-        FirebaseFirestore.instance.collection('predictions');
+  Future<void> saveConsultationDetails() async {
+    if (_patientDocumentId == null) {
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.error,
+        body: const Center(
+          child: Text(
+            'Patient not found, cannot update booking details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: 'This is Ignored',
+        desc: 'This is also Ignored',
+        btnOkColor: Colors.deepPurple,
+        btnOkOnPress: () {},
+      ).show();
+      return;
+    }
 
     try {
-      await predictions.add({
-        'age': ageController.text,
-        'sex': genderController.text,
-        'restingBpS': resingBPController.text,
-        'cholesterol': cholesterolController.text,
-        'chestPainType': chestController.text,
-        'fastingBloodSugar': fastingController.text,
-        'restingEcg': resingECGController.text,
-        'maxHeartRate': heartrateController.text,
-        'exerciseAngina': exerciseController.text,
-        'STSlope': stController.text,
-        'oldpeak': oldpeakController.text,
-        'Dateofconsultation': Timestamp.now(),
+      await FirebaseFirestore.instance
+          .collection('patients')
+          .doc(_patientDocumentId)
+          .update({
+        'consultation': FieldValue.arrayUnion([
+          {
+            'age': ageController.text,
+            'sex': genderController.text,
+            'restingBpS': resingBPController.text,
+            'cholesterol': cholesterolController.text,
+            'chestPainType': chestController.text,
+            'fastingBloodSugar': fastingController.text,
+            'restingEcg': resingECGController.text,
+            'maxHeartRate': heartrateController.text,
+            'exerciseAngina': exerciseController.text,
+            'STSlope': stController.text,
+            'oldpeak': oldpeakController.text,
+            'Dateofconsultation': Timestamp.now(),
+          }
+        ])
       });
-    } catch (e) {
-      SnackBar(
-        backgroundColor: Colors.green,
-        content: Text(
-          "",
-          style: TextStyle(fontSize: 20, color: Colors.white),
+    }
+    // try {
+    //   await patientDocument!.update({
+    //     'consultations': FieldValue.arrayUnion([
+    //       {
+    //         'age': ageController.text,
+    //         'sex': genderController.text,
+    //         'restingBpS': resingBPController.text,
+    //         'cholesterol': cholesterolController.text,
+    //         'chestPainType': chestController.text,
+    //         'fastingBloodSugar': fastingController.text,
+    //         'restingEcg': resingECGController.text,
+    //         'maxHeartRate': heartrateController.text,
+    //         'exerciseAngina': exerciseController.text,
+    //         'STSlope': stController.text,
+    //         'oldpeak': oldpeakController.text,
+    //         'Dateofconsultation': Timestamp.now(),
+    //       }
+    //     ])
+    //   });
+    //   AwesomeDialog(
+    //     context: context,
+    //     animType: AnimType.scale,
+    //     dialogType: DialogType.success,
+    //     body: const Center(
+    //       child: Text(
+    //         'Consultation details saved successfully',
+    //         style: TextStyle(fontWeight: FontWeight.bold),
+    //       ),
+    //     ),
+    //     title: 'Success',
+    //     desc: 'Consultation details added to patient record',
+    //     btnOkColor: Colors.deepPurple,
+    //     btnOkOnPress: () {},
+    //   ).show();
+    // }
+    catch (e) {
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.error,
+        body: const Center(
+          child: Text(
+            'Error while saving consultation details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
-      );
+        title: 'Error',
+        desc: 'Could not save consultation details',
+        btnOkColor: Colors.deepPurple,
+        btnOkOnPress: () {},
+      ).show();
     }
   }
+  // else {
+  //   AwesomeDialog(
+  //     context: context,
+  //     animType: AnimType.scale,
+  //     dialogType: DialogType.error,
+  //     body: const Center(
+  //       child: Text(
+  //         'No patient selected',
+  //         style: TextStyle(fontWeight: FontWeight.bold),
+  //       ),
+  //     ),
+  //     title: 'Error',
+  //     desc: 'Please enter a valid auth code to select a patient',
+  //     btnOkColor: Colors.deepPurple,
+  //     btnOkOnPress: () {},
+  //   ).show();
+  // }
+
+  // Future<void> SavePredition() async {
+  //   CollectionReference predictions =
+  //       FirebaseFirestore.instance.collection('predictions');
+
+  //   try {
+  //     await predictions.add({
+  //       'age': ageController.text,
+  //       'sex': genderController.text,
+  //       'restingBpS': resingBPController.text,
+  //       'cholesterol': cholesterolController.text,
+  //       'chestPainType': chestController.text,
+  //       'fastingBloodSugar': fastingController.text,
+  //       'restingEcg': resingECGController.text,
+  //       'maxHeartRate': heartrateController.text,
+  //       'exerciseAngina': exerciseController.text,
+  //       'STSlope': stController.text,
+  //       'oldpeak': oldpeakController.text,
+  //       'Dateofconsultation': Timestamp.now(),
+  //     });
+  //   } catch (e) {
+  //     SnackBar(
+  //       backgroundColor: Colors.green,
+  //       content: Text(
+  //         "",
+  //         style: TextStyle(fontSize: 20, color: Colors.white),
+  //       ),
+  //     );
+  //   }
+  // }
 
   Future<void> submitRequest() async {
     bool validateFields() {
@@ -98,13 +213,12 @@ class _ConsultPageState extends State<ConsultPage> {
           ),
         ),
         title: 'ERROR',
-        desc: 'This is also Ignored',
+        desc: 'Please fill all the fields',
         btnOkColor: Colors.deepPurple,
         btnOkOnPress: () {},
       ).show();
     } else {
-      var url = 'http://192.168.127.253:3004/predict';
-      // var url = 'https://stocka.anettcom.com/ai/';
+      var url = 'http://192.168.158.253:3004/predict';
 
       final response = await http.post(
         Uri.parse(url),
@@ -130,7 +244,7 @@ class _ConsultPageState extends State<ConsultPage> {
         final responseData = json.decode(response.body);
         print(responseData); // Print or process the response data
 
-        return AwesomeDialog(
+        AwesomeDialog(
           context: context,
           animType: AnimType.scale,
           dialogType: DialogType.success,
@@ -140,12 +254,13 @@ class _ConsultPageState extends State<ConsultPage> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          title: 'This is Ignored',
-          desc: 'This is also Ignored',
+          title: 'Success',
+          desc:
+              'Prediction successful and Booking details added to patient successfully!',
           btnOkColor: Colors.deepPurple,
           btnOkOnPress: () {
-            // SavePredition();
-            // clearFields();
+            saveConsultationDetails();
+            clearFields();
           },
         ).show();
       } else {
@@ -153,15 +268,15 @@ class _ConsultPageState extends State<ConsultPage> {
         AwesomeDialog(
           context: context,
           animType: AnimType.scale,
-          dialogType: DialogType.success,
+          dialogType: DialogType.error,
           body: Center(
             child: Text(
-              "Message  ${response.statusCode}".toString(),
+              "Request failed with status: ${response.statusCode}".toString(),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          title: 'This is Ignored',
-          desc: 'This is also Ignored',
+          title: 'Error',
+          desc: 'Prediction request failed',
           btnOkColor: Colors.deepPurple,
           btnOkOnPress: () {
             clearFields();
@@ -170,7 +285,6 @@ class _ConsultPageState extends State<ConsultPage> {
       }
     }
   }
-
 
   Timer? _debounce;
 
@@ -200,6 +314,9 @@ class _ConsultPageState extends State<ConsultPage> {
         // Retrieve the auth codes
         var patientData =
             querySnapshot.docs.first.data() as Map<String, dynamic>;
+
+        // Store the document ID
+        _patientDocumentId = querySnapshot.docs.first.id;
 
         // Update respective text form field controllers with patient details
         setState(() {
@@ -231,7 +348,6 @@ class _ConsultPageState extends State<ConsultPage> {
       // print("Error fetching patient details: $e");
     }
   }
-
 
   void clearFields() {
     ageController.clear();
@@ -288,7 +404,7 @@ class _ConsultPageState extends State<ConsultPage> {
                   const SizedBox(
                     height: 15,
                   ),
-                 Container(
+                  Container(
                     padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.deepPurple),
@@ -608,7 +724,7 @@ class _ConsultPageState extends State<ConsultPage> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 20),
                   InkWell(
                     onTap: () {
