@@ -65,6 +65,240 @@ class AvailableDriversTableState extends State<AvailableDriversTable> {
     });
   }
 
+  void showPatientDetailsDialog(
+      BuildContext context, Map<String, dynamic> patientData) {
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Prevents closing the dialog by tapping outside
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async =>
+              false, // Prevents closing the dialog with the back button
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              padding: EdgeInsets.all(20.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Patient Details',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 20),
+                   
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'First Name: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .black, // Make sure to specify the color since default is white for TextSpan
+                            ),
+                          ),
+                          TextSpan(
+                            text: patientData['firstName'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black, // Same here for color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('Last Name: ${patientData['lastName']}'),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'First Name: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .black, // Make sure to specify the color since default is white for TextSpan
+                            ),
+                          ),
+                          TextSpan(
+                            text: patientData['firstName'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black, // Same here for color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('Last Name: ${patientData['lastName']}'),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'First Name: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .black, // Make sure to specify the color since default is white for TextSpan
+                            ),
+                          ),
+                          TextSpan(
+                            text: patientData['firstName'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black, // Same here for color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('Last Name: ${patientData['lastName']}'),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'First Name: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .black, // Make sure to specify the color since default is white for TextSpan
+                            ),
+                          ),
+                          TextSpan(
+                            text: patientData['firstName'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black, // Same here for color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('Last Name: ${patientData['lastName']}'),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'First Name: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .black, // Make sure to specify the color since default is white for TextSpan
+                            ),
+                          ),
+                          TextSpan(
+                            text: patientData['firstName'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black, // Same here for color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('Last Name: ${patientData['lastName']}'),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'First Name: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .black, // Make sure to specify the color since default is white for TextSpan
+                            ),
+                          ),
+                          TextSpan(
+                            text: patientData['firstName'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black, // Same here for color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('Last Name: ${patientData['lastName']}'),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'First Name: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .black, // Make sure to specify the color since default is white for TextSpan
+                            ),
+                          ),
+                          TextSpan(
+                            text: patientData['firstName'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black, // Same here for color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('Last Name: ${patientData['lastName']}'),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'First Name: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .black, // Make sure to specify the color since default is white for TextSpan
+                            ),
+                          ),
+                          TextSpan(
+                            text: patientData['firstName'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black, // Same here for color
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text('Last Name: ${patientData['lastName']}'),
+                    Text('Email: ${patientData['email']}'),
+                    Text('Phone Number: ${patientData['phoneNumber']}'),
+                    Text('Consultant: ${patientData['consultingDoctor']}'),
+                    Text('Date of Appointment: ${patientData['date']}'),
+                    Text('Symptoms: ${patientData['symptoms']}'),
+                    Text('Note: ${patientData['note']}'),
+                    SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Color(0XFFD50000))),
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(
+                          'Close',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -170,15 +404,33 @@ class AvailableDriversTableState extends State<AvailableDriversTable> {
                     final patientData = document.data() as Map<String, dynamic>;
                     return DataRow(
                       cells: [
-                        DataCell(Text(patientData['firstName'])),
-                        DataCell(Text(patientData['lastName'])),
-                        DataCell(Text(patientData['email'])),
-                        DataCell(Text(patientData['age'])),
-                        DataCell(Text(patientData['mobile'])),
-                        DataCell(Text(patientData['code'])),
-                        DataCell(Text(patientData['gender'])),
-                        DataCell(Text(patientData['address'])),
-                        DataCell(Text(patientData['medicalHistory'])),
+                        DataCell(Text(patientData['firstName']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
+                        DataCell(Text(patientData['lastName']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
+                        DataCell(Text(patientData['email']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
+                        DataCell(Text(patientData['age']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
+                        DataCell(Text(patientData['mobile']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
+                        DataCell(Text(patientData['code']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
+                        DataCell(Text(patientData['gender']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
+                        DataCell(Text(patientData['address']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
+                        DataCell(Text(patientData['medicalHistory']),
+                            onTap: () =>
+                                showPatientDetailsDialog(context, patientData)),
                       ],
                     );
                   }).toList(),

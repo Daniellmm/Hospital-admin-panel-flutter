@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -37,6 +39,66 @@ class _PharmacyPageState extends State<PharmacyPage> {
     }).catchError((error) {
       print('Failed to initialize Firebase: $error');
     });
+  }
+
+  Timer? _debounce;
+
+  void _onAuthCodeChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 700), () {
+      fetchPatientDetails(value); // Fetch details after delay
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void fetchPatientDetails(String authCode) async {
+    try {
+      // Query Firestore to get the patient details based on the auth code
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('patients')
+          .where('code', isEqualTo: authCode)
+          .get();
+
+      // Check if any matching patient record found
+      if (querySnapshot.docs.isNotEmpty) {
+        // Retrieve the auth codes
+        var patientData =
+            querySnapshot.docs.first.data() as Map<String, dynamic>;
+
+        // Update respective text form field controllers with patient details
+        setState(() {
+          String firstName = patientData['firstName'] ?? '';
+          String lastName = patientData['lastName'] ?? '';
+          fullnameController.text = '$firstName $lastName';
+        });
+      } else {
+        // Clear text form field controllers if no matching patient record found
+        clearFields();
+      }
+    } catch (e) {
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.error,
+        body: const Center(
+          child: Text(
+            'Error while fetching patient details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: 'This is Ignored',
+        desc: 'This is also Ignored',
+        btnOkColor: Colors.deepPurple,
+        btnOkOnPress: () {},
+      ).show();
+      // Handle errors, such as Firestore query failures
+      // print("Error fetching patient details: $e");
+    }
   }
 
   // Save data to Firestore
@@ -152,20 +214,22 @@ class _PharmacyPageState extends State<PharmacyPage> {
                       border: Border.all(color: Colors.deepPurple),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextFormField(
-                          controller: authController,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Auth Number',
-                            hintStyle: TextStyle(color: Colors.grey),
-                          ),
+                    child: Center(
+                      child: TextFormField(
+                        controller: authController,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Auth Code",
+                          hintStyle: TextStyle(color: Colors.grey),
                         ),
-                      ],
+                        onChanged: (value) {
+                          _onAuthCodeChanged(
+                              value); // Fetch details when code changes
+                        },
+                      ),
                     ),
                   ),
+
                   const SizedBox(
                     height: 20,
                   ),
@@ -183,6 +247,7 @@ class _PharmacyPageState extends State<PharmacyPage> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
+                        readOnly: true,
                         controller: fullnameController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,6 +20,7 @@ class ConsultPage extends StatefulWidget {
 
 class _ConsultPageState extends State<ConsultPage> {
   final TextEditingController ageController = TextEditingController();
+  final TextEditingController fullnameController = TextEditingController();
   final TextEditingController authController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
   final TextEditingController resingBPController = TextEditingController();
@@ -70,6 +73,7 @@ class _ConsultPageState extends State<ConsultPage> {
     bool validateFields() {
       return ageController.text.isNotEmpty &&
           genderController.text.isNotEmpty &&
+          fullnameController.text.isNotEmpty &&
           authController.text.isNotEmpty &&
           resingBPController.text.isNotEmpty &&
           cholesterolController.text.isNotEmpty &&
@@ -167,8 +171,71 @@ class _ConsultPageState extends State<ConsultPage> {
     }
   }
 
+
+  Timer? _debounce;
+
+  void _onAuthCodeChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 700), () {
+      fetchPatientDetails(value); // Fetch details after delay
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void fetchPatientDetails(String authCode) async {
+    try {
+      // Query Firestore to get the patient details based on the auth code
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('patients')
+          .where('code', isEqualTo: authCode)
+          .get();
+
+      // Check if any matching patient record found
+      if (querySnapshot.docs.isNotEmpty) {
+        // Retrieve the auth codes
+        var patientData =
+            querySnapshot.docs.first.data() as Map<String, dynamic>;
+
+        // Update respective text form field controllers with patient details
+        setState(() {
+          String firstName = patientData['firstName'] ?? '';
+          String lastName = patientData['lastName'] ?? '';
+          fullnameController.text = '$firstName $lastName';
+        });
+      } else {
+        // Clear text form field controllers if no matching patient record found
+        clearFields();
+      }
+    } catch (e) {
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.error,
+        body: const Center(
+          child: Text(
+            'Error while fetching patient details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: 'This is Ignored',
+        desc: 'This is also Ignored',
+        btnOkColor: Colors.deepPurple,
+        btnOkOnPress: () {},
+      ).show();
+      // Handle errors, such as Firestore query failures
+      // print("Error fetching patient details: $e");
+    }
+  }
+
+
   void clearFields() {
     ageController.clear();
+    fullnameController.clear();
     authController.clear();
     genderController.clear();
     resingBPController.clear();
@@ -221,6 +288,37 @@ class _ConsultPageState extends State<ConsultPage> {
                   const SizedBox(
                     height: 15,
                   ),
+                 Container(
+                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: TextFormField(
+                        controller: authController,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Auth Code",
+                          hintStyle: TextStyle(color: Colors.grey),
+                        ),
+                        onChanged: (value) {
+                          _onAuthCodeChanged(
+                              value); // Fetch details when code changes
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
+                    'Full Name',
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
                   Container(
                     padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
                     decoration: BoxDecoration(
@@ -228,10 +326,11 @@ class _ConsultPageState extends State<ConsultPage> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
-                        controller: authController,
+                        readOnly: true,
+                        controller: fullnameController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
-                            hintText: "Auth Number",
+                            hintText: "Full Name ",
                             hintStyle: TextStyle(color: Colors.grey)),
                       ),
                     ),

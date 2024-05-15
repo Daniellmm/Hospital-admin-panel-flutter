@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:hmsapp/constants/controllers.dart';
 import 'package:hmsapp/helpers/responsiveness.dart';
@@ -16,6 +17,7 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
+  TextEditingController authController = TextEditingController();
   TextEditingController firstnameController = TextEditingController();
   TextEditingController lastnameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -25,16 +27,153 @@ class _BookingPageState extends State<BookingPage> {
   TextEditingController dateController = TextEditingController();
   TextEditingController noteController = TextEditingController();
 
+  String? _patientDocumentId;
+
   @override
   void initState() {
     super.initState();
     Firebase.initializeApp(); // Initialize Firebase
   }
 
- Future<void> BookTime() async {
+  Timer? _debounce;
+
+  void _onAuthCodeChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 700), () {
+      fetchPatientDetails(value); // Fetch details after delay
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void fetchPatientDetails(String authCode) async {
+    try {
+      // Query Firestore to get the patient details based on the auth code
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('patients')
+          .where('code', isEqualTo: authCode)
+          .get();
+
+      // Check if any matching patient record found
+      if (querySnapshot.docs.isNotEmpty) {
+        // Retrieve the auth codes
+        var patientData =
+            querySnapshot.docs.first.data() as Map<String, dynamic>;
+
+        // Store the document ID
+        _patientDocumentId = querySnapshot.docs.first.id;
+
+        // Update respective text form field controllers with patient details
+        setState(() {
+          firstnameController.text = patientData['firstName'] ?? '';
+          lastnameController.text = patientData['lastName'] ?? '';
+          phoneController.text = patientData['phoneNumber'] ?? '';
+          emailController.text = patientData['email'] ?? '';
+          phoneController.text = patientData['mobile'] ?? '';
+        });
+      } else {
+        // Clear text form field controllers if no matching patient record found
+        clearFields();
+      }
+    } catch (e) {
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.error,
+        body: const Center(
+          child: Text(
+            'Error while fetching patient details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: 'This is Ignored',
+        desc: 'This is also Ignored',
+        btnOkColor: Colors.deepPurple,
+        btnOkOnPress: () {},
+      ).show();
+      // Handle errors, such as Firestore query failures
+      // print("Error fetching patient details: $e");
+    }
+  }
+
+
+  Future<void> updatePatientWithBooking() async {
+    if (_patientDocumentId == null) {
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.error,
+        body: const Center(
+          child: Text(
+            'Patient not found, cannot update booking details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: 'This is Ignored',
+        desc: 'This is also Ignored',
+        btnOkColor: Colors.deepPurple,
+        btnOkOnPress: () {},
+      ).show();
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('patients')
+          .doc(_patientDocumentId)
+          .update({
+        'bookings': FieldValue.arrayUnion([
+          {
+            'Auth': authController.text,
+            'consultingDoctor': consultingController.text,
+            'date': dateController.text,
+            'symptoms': symptomController.text,
+            'note': noteController.text,
+            'Dateofappointment': Timestamp.now(),
+          }
+        ])
+      });
+
+      AwesomeDialog(
+        context: context,
+        animType: AnimType.scale,
+        dialogType: DialogType.success,
+        body: Center(
+          child: Text(
+            "Booking details added to patient successfully!",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: 'This is Ignored',
+        desc: 'This is also Ignored',
+        btnOkColor: Colors.deepPurple,
+        btnOkOnPress: () {
+          clearFields();
+        },
+      ).show();
+    } catch (e) {
+      // Show error snackbar if Firestore operation fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            "Error: $e",
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ),
+      );
+    }
+  }
+
+Future<void> BookTime() async {
     // Function to validate if the TextFormField is empty
     bool validateFields() {
       return firstnameController.text.isNotEmpty &&
+          authController.text.isNotEmpty &&
           lastnameController.text.isNotEmpty &&
           phoneController.text.isNotEmpty &&
           emailController.text.isNotEmpty &&
@@ -62,43 +201,9 @@ class _BookingPageState extends State<BookingPage> {
         btnOkOnPress: () {},
       ).show();
     } else {
-      CollectionReference bookings =
-          FirebaseFirestore.instance.collection('bookings');
-
       try {
-        // Add the details to Firestore
-        DocumentReference result = await bookings.add({
-          'firstName': firstnameController.text,
-          'lastName': lastnameController.text,
-          'email': emailController.text,
-          'phoneNumber': phoneController.text,
-          'consulting Doctor': consultingController.text,
-          'date': dateController.text,
-          'symptoms': symptomController.text,
-          'note': noteController.text,
-          'Dateofappointment': Timestamp.now(),
-        });
-
-       
-
-        // Show success dialog after sending SMS
-        AwesomeDialog(
-          context: context,
-          animType: AnimType.scale,
-          dialogType: DialogType.success,
-          body: Center(
-            child: Text(
-              "Appointment Booked Successfully. SMS Sent!",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          title: 'This is Ignored',
-          desc: 'This is also Ignored',
-          btnOkColor: Colors.deepPurple,
-          btnOkOnPress: () {
-            clearFields();
-          },
-        ).show();
+        // Update patient with booking details
+        await updatePatientWithBooking();
       } catch (e) {
         // Show error snackbar if Firestore operation fails
         ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +219,11 @@ class _BookingPageState extends State<BookingPage> {
     }
   }
 
+
+
+
   void clearFields() {
+    authController.clear();
     firstnameController.clear();
     lastnameController.clear();
     phoneController.clear();
@@ -158,6 +267,39 @@ class _BookingPageState extends State<BookingPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
+                    'Auth Code',
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                 
+                  Container(
+                    padding: const EdgeInsets.only(left: 20, top: 5, bottom: 5),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: TextFormField(
+                        controller: authController,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Auth Code",
+                          hintStyle: TextStyle(color: Colors.grey),
+                        ),
+                        onChanged: (value) {
+                          _onAuthCodeChanged(
+                              value); // Fetch details when code changes
+                        },
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
                     'First Name',
                     style: TextStyle(fontSize: 25),
                   ),
@@ -171,6 +313,7 @@ class _BookingPageState extends State<BookingPage> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
+                         readOnly: true,
                         controller: firstnameController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
@@ -196,6 +339,7 @@ class _BookingPageState extends State<BookingPage> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
+                         readOnly: true,
                         controller: lastnameController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
@@ -225,6 +369,7 @@ class _BookingPageState extends State<BookingPage> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
+                         readOnly: true,
                         controller: emailController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
@@ -251,6 +396,7 @@ class _BookingPageState extends State<BookingPage> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Center(
                       child: TextFormField(
+                         readOnly: true,
                         controller: phoneController,
                         decoration: const InputDecoration(
                             border: InputBorder.none,
