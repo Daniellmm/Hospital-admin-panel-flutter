@@ -74,7 +74,7 @@ class _PharmacyPageState extends State<PharmacyPage> {
           fullnameController.text = '$firstName $lastName';
         });
       } else {
-        clearFields();
+        // clearFields();
       }
     } catch (e) {
       AwesomeDialog(

@@ -22,13 +22,33 @@ class _OverviewCardsLargeScreenState extends State<OverviewCardsLargeScreen> {
     // Call functions to fetch data from Firestore and update counts
     fetchAppointmentCount();
     fetchConsultationCount();
-    fetchTotalPatientsThisWeek(); // Call the function to fetch total patients this week
-    // Listen for changes in patients collection
+    fetchTotalPatientsThisWeek();
+
+    // Listen for changes in the bookings field of any patient document
     FirebaseFirestore.instance
         .collection('patients')
         .snapshots()
         .listen((event) {
-      fetchAppointmentCount(); // Update appointment count whenever patient collection changes
+      event.docChanges.forEach((change) {
+        final data = change.doc.data();
+        if (data != null) {
+          if (data.containsKey('bookings')) {
+            // Update appointment count whenever bookings field is updated
+            fetchAppointmentCount();
+          }
+          if (data.containsKey('consultationDate')) {
+            // Update consultation count whenever consultationDate field is updated
+            fetchConsultationCount();
+          }
+        }
+      });
+    });
+
+    // Listen for changes in the patients collection for new patients count
+    FirebaseFirestore.instance
+        .collection('patients')
+        .snapshots()
+        .listen((event) {
       fetchNewPatientsCount();
     });
   }
@@ -53,18 +73,31 @@ class _OverviewCardsLargeScreenState extends State<OverviewCardsLargeScreen> {
     });
   }
 
- Future<void> fetchAppointmentCount() async {
+  Future<void> fetchAppointmentCount() async {
+    // Calculate the start and end of the current day
+    DateTime now = DateTime.now();
+    DateTime startOfDay = DateTime(now.year, now.month, now.day);
+    DateTime endOfDay = startOfDay.add(Duration(days: 1));
+
+    // Retrieve data from Firestore
     QuerySnapshot<Map<String, dynamic>> snapshot =
         await FirebaseFirestore.instance.collection('patients').get();
 
     int count = 0;
 
-    // Iterate through each patient document
+    // Count the number of appointments for today from each patient document
     snapshot.docs.forEach((doc) {
-      // Check if the document contains a 'booking' field and it's an array
-      if (doc.data().containsKey('booking') && doc['booking'] is List) {
-        // Increment count by the length of the 'booking' array
-        count += (doc['booking'] as List).length;
+      if (doc.data().containsKey('bookings')) {
+        List<dynamic> bookings = doc['bookings'];
+        bookings.forEach((booking) {
+          // Assuming booking has a field 'date' of type Timestamp
+          DateTime bookingDate =
+              (booking['Dateofappointment'] as Timestamp).toDate();
+          if (bookingDate.isAfter(startOfDay) &&
+              bookingDate.isBefore(endOfDay)) {
+            count++;
+          }
+        });
       }
     });
 
@@ -74,25 +107,47 @@ class _OverviewCardsLargeScreenState extends State<OverviewCardsLargeScreen> {
     });
   }
 
-
-
   Future<void> fetchConsultationCount() async {
     // Calculate the start and end of the current day
     DateTime now = DateTime.now();
     DateTime startOfDay = DateTime(now.year, now.month, now.day);
     DateTime endOfDay = startOfDay.add(Duration(days: 1));
 
-    // Retrieve data from Firestore
-    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-        .instance
-        .collection('patients')
-        .where('consultationDate', isGreaterThanOrEqualTo: startOfDay)
-        .where('consultationDate', isLessThan: endOfDay)
-        .get();
+   
+
+
+
+        // Retrieve data from Firestore
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('patients').get();
+
+    int count = 0;
+
+    // Count the number of appointments for today from each patient document
+    snapshot.docs.forEach((doc) {
+      if (doc.data().containsKey('consultation')) {
+        List<dynamic> bookings = doc['consultation'];
+        bookings.forEach((booking) {
+          // Assuming booking has a field 'date' of type Timestamp
+          DateTime bookingDate =
+              (booking['Dateofconsultation'] as Timestamp).toDate();
+          if (bookingDate.isAfter(startOfDay) &&
+              bookingDate.isBefore(endOfDay)) {
+            count++;
+          }
+        });
+      }
+    });
+
+
+
+
+
+
 
     // Update the count of consultations for today
     setState(() {
-      consultationCount = snapshot.docs.length;
+      consultationCount = count;
     });
   }
 

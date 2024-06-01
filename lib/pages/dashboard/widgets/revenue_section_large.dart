@@ -21,88 +21,149 @@ class _RevenueSectionLargeState extends State<RevenueSectionLarge> {
   @override
   void initState() {
     super.initState();
-    updateTodayRevenue();
+
+    // Listen for changes in the payments field of any patient document
+    FirebaseFirestore.instance
+        .collection('patients')
+        .snapshots()
+        .listen((event) {
+      updateTodayRevenue();
+      updateLast7DaysRevenue();
+      updateLast30DaysRevenue();
+      updateLast12MonthsRevenue();
+    });
   }
 
   void updateTodayRevenue() {
     // Get today's date
     DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime startOfDay = DateTime(now.year, now.month, now.day);
+    DateTime endOfDay = startOfDay.add(Duration(days: 1));
 
-    // Get payments made today
+    // Retrieve data from Firestore
     FirebaseFirestore.instance
-        .collection('Payments')
-        .where('paymentDate',
-            isGreaterThanOrEqualTo: today,
-            isLessThan: today.add(Duration(days: 1)))
+        .collection('patients')
+        .where('payment.paymentDate',
+            isGreaterThanOrEqualTo: startOfDay, isLessThan: endOfDay)
         .get()
         .then((QuerySnapshot querySnapshot) {
       double totalAmount = 0.0;
       querySnapshot.docs.forEach((doc) {
-        totalAmount += double.parse(doc['Totalbills']);
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('payment')) {
+          List<dynamic> payments = data['payment'];
+          payments.forEach((payment) {
+            // Check if payment date is today
+            DateTime paymentDate =
+                (payment['paymentDate'] as Timestamp).toDate();
+            if (paymentDate.isAfter(startOfDay) &&
+                paymentDate.isBefore(endOfDay)) {
+              totalAmount += payment['amount'];
+            }
+          });
+        }
       });
 
-      // Update the UI with today's revenue
+      // Update today's revenue
       setState(() {
         todayRevenue = totalAmount;
       });
     });
+  }
 
-    // Get payments made in the last 7 days
-    DateTime sevenDaysAgo = today.subtract(Duration(days: 7));
+  void updateLast7DaysRevenue() {
+    // Calculate the date 7 days ago
+    DateTime now = DateTime.now();
+    DateTime sevenDaysAgo = now.subtract(Duration(days: 7));
+
+    // Retrieve data from Firestore
     FirebaseFirestore.instance
-        .collection('Payments')
-        .where('paymentDate',
-            isGreaterThanOrEqualTo: sevenDaysAgo,
-            isLessThan: today.add(Duration(days: 1)))
+        .collection('patients')
         .get()
         .then((QuerySnapshot querySnapshot) {
       double totalAmount = 0.0;
       querySnapshot.docs.forEach((doc) {
-        totalAmount += double.parse(doc['Totalbills']);
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('payments')) {
+          List<dynamic> payments = data['payment'];
+          payments.forEach((payments) {
+            DateTime paymentDate =
+                (payments['paymentDate'] as Timestamp).toDate();
+            if (paymentDate.isAfter(sevenDaysAgo) &&
+                paymentDate.isBefore(now)) {
+              totalAmount += payments['Totalbills'];
+            }
+          });
+        }
       });
 
-      // Update the UI with last 7 days revenue
+      // Update last 7 days revenue
       setState(() {
         last7DaysRevenue = totalAmount;
       });
     });
+  }
 
-    // Get payments made in the last 30 days
-    DateTime thirtyDaysAgo = today.subtract(Duration(days: 30));
+  void updateLast30DaysRevenue() {
+    // Calculate the date 30 days ago
+    DateTime now = DateTime.now();
+    DateTime thirtyDaysAgo = now.subtract(Duration(days: 30));
+
+    // Retrieve data from Firestore
     FirebaseFirestore.instance
-        .collection('Payments')
-        .where('paymentDate',
-            isGreaterThanOrEqualTo: thirtyDaysAgo,
-            isLessThan: today.add(Duration(days: 1)))
+        .collection('patients')
         .get()
         .then((QuerySnapshot querySnapshot) {
       double totalAmount = 0.0;
       querySnapshot.docs.forEach((doc) {
-        totalAmount += double.parse(doc['Totalbills']);
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('payments')) {
+          List<dynamic> payments = data['payment'];
+          payments.forEach((payment) {
+            DateTime paymentDate =
+                (payment['paymentDate'] as Timestamp).toDate();
+            if (paymentDate.isAfter(thirtyDaysAgo) &&
+                paymentDate.isBefore(now)) {
+              totalAmount += payment['amount'];
+            }
+          });
+        }
       });
 
-      // Update the UI with last 30 days revenue
+      // Update last 30 days revenue
       setState(() {
         last30DaysRevenue = totalAmount;
       });
     });
+  }
 
-    // Get payments made in the last 12 months
-    DateTime twelveMonthsAgo = today.subtract(Duration(days: 365));
+  void updateLast12MonthsRevenue() {
+    // Calculate the date 12 months ago
+    DateTime now = DateTime.now();
+    DateTime twelveMonthsAgo = now.subtract(Duration(days: 365));
+
+    // Retrieve data from Firestore
     FirebaseFirestore.instance
-        .collection('Payments')
-        .where('paymentDate',
-            isGreaterThanOrEqualTo: twelveMonthsAgo,
-            isLessThan: today.add(Duration(days: 1)))
+        .collection('patients')
         .get()
         .then((QuerySnapshot querySnapshot) {
       double totalAmount = 0.0;
       querySnapshot.docs.forEach((doc) {
-        totalAmount += double.parse(doc['Totalbills']);
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('payment')) {
+          List<dynamic> payments = data['paymentS'];
+          payments.forEach((payment) {
+            DateTime paymentDate =
+                (payment['paymentDate'] as Timestamp).toDate();
+            if (paymentDate.isAfter(twelveMonthsAgo) &&
+                paymentDate.isBefore(now)) {
+              totalAmount += payment['Totalbills'];
+            }
+          });
+        }
       });
 
-      // Update the UI with last 12 months revenue
+      // Update last 12 months revenue
       setState(() {
         last12MonthsRevenue = totalAmount;
       });
@@ -168,9 +229,7 @@ class _RevenueSectionLargeState extends State<RevenueSectionLarge> {
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 30,
-                ),
+                SizedBox(height: 30),
                 Row(
                   children: [
                     RevenueInfo(

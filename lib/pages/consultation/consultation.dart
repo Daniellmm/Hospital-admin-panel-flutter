@@ -287,13 +287,18 @@ class _ConsultPageState extends State<ConsultPage> {
   }
 
   Timer? _debounce;
+String? _lastFetchedCode;
 
   void _onAuthCodeChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 700), () {
-      fetchPatientDetails(value); // Fetch details after delay
+      if (value != _lastFetchedCode) {
+        _lastFetchedCode = value;
+        fetchPatientDetails(value); // Fetch details after delay
+      }
     });
   }
+
 
   @override
   void dispose() {
@@ -326,7 +331,7 @@ class _ConsultPageState extends State<ConsultPage> {
         });
       } else {
         // Clear text form field controllers if no matching patient record found
-        clearFields();
+        // clearFields();
       }
     } catch (e) {
       AwesomeDialog(

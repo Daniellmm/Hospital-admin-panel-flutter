@@ -22,8 +22,29 @@ class _OverviewCardsSmallScreenState extends State<OverviewCardsSmallScreen> {
     // Call functions to fetch data from Firestore and update counts
     fetchAppointmentCount();
     fetchConsultationCount();
-    fetchTotalPatientsThisWeek(); // Call the function to fetch total patients this week
-    // Listen for changes in patients collection
+    fetchTotalPatientsThisWeek();
+
+    // Listen for changes in the bookings field of any patient document
+    FirebaseFirestore.instance
+        .collection('patients')
+        .snapshots()
+        .listen((event) {
+      event.docChanges.forEach((change) {
+        final data = change.doc.data();
+        if (data != null) {
+          if (data.containsKey('bookings')) {
+            // Update appointment count whenever bookings field is updated
+            fetchAppointmentCount();
+          }
+          if (data.containsKey('consultationDate')) {
+            // Update consultation count whenever consultationDate field is updated
+            fetchConsultationCount();
+          }
+        }
+      });
+    });
+
+    // Listen for changes in the patients collection for new patients count
     FirebaseFirestore.instance
         .collection('patients')
         .snapshots()
@@ -59,16 +80,30 @@ class _OverviewCardsSmallScreenState extends State<OverviewCardsSmallScreen> {
     DateTime endOfDay = startOfDay.add(Duration(days: 1));
 
     // Retrieve data from Firestore
-    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-        .instance
-        .collection('bookings')
-        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
-        .where('dateTime', isLessThan: endOfDay)
-        .get();
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('patients').get();
 
-    // Update the count of appointments for today
+    int count = 0;
+
+    // Count the number of appointments for today from each patient document
+    snapshot.docs.forEach((doc) {
+      if (doc.data().containsKey('bookings')) {
+        List<dynamic> bookings = doc['bookings'];
+        bookings.forEach((booking) {
+          // Assuming booking has a field 'date' of type Timestamp
+          DateTime bookingDate =
+              (booking['Dateofappointment'] as Timestamp).toDate();
+          if (bookingDate.isAfter(startOfDay) &&
+              bookingDate.isBefore(endOfDay)) {
+            count++;
+          }
+        });
+      }
+    });
+
+    // Update the appointment count
     setState(() {
-      appointmentCount = snapshot.docs.length;
+      appointmentCount = count;
     });
   }
 
@@ -79,20 +114,34 @@ class _OverviewCardsSmallScreenState extends State<OverviewCardsSmallScreen> {
     DateTime endOfDay = startOfDay.add(Duration(days: 1));
 
     // Retrieve data from Firestore
-    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-        .instance
-        .collection('consultations')
-        .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
-        .where('dateTime', isLessThan: endOfDay)
-        .get();
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('patients').get();
+
+    int count = 0;
+
+    // Count the number of appointments for today from each patient document
+    snapshot.docs.forEach((doc) {
+      if (doc.data().containsKey('consultation')) {
+        List<dynamic> bookings = doc['consultation'];
+        bookings.forEach((booking) {
+          // Assuming booking has a field 'date' of type Timestamp
+          DateTime bookingDate =
+              (booking['Dateofconsultation'] as Timestamp).toDate();
+          if (bookingDate.isAfter(startOfDay) &&
+              bookingDate.isBefore(endOfDay)) {
+            count++;
+          }
+        });
+      }
+    });
 
     // Update the count of consultations for today
     setState(() {
-      consultationCount = snapshot.docs.length;
+      consultationCount = count;
     });
   }
 
- Future<void> fetchTotalPatientsThisWeek() async {
+  Future<void> fetchTotalPatientsThisWeek() async {
     // Calculate the start date of the current week (assuming week starts on Sunday)
     DateTime now = DateTime.now();
     DateTime startOfWeek = now.subtract(Duration(days: now.weekday));

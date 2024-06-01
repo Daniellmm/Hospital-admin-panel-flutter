@@ -72,7 +72,7 @@ class _PaymentPageState extends State<PaymentPage> {
           fullnameController.text = '$firstName $lastName';
         });
       } else {
-        clearFields();
+        // clearFields();
       }
     } catch (e) {
       AwesomeDialog(

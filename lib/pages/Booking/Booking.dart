@@ -77,7 +77,7 @@ class _BookingPageState extends State<BookingPage> {
         });
       } else {
         // Clear text form field controllers if no matching patient record found
-        clearFields();
+        // clearFields();
       }
     } catch (e) {
       AwesomeDialog(
